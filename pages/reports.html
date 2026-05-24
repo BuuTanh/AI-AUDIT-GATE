@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Báo cáo — AI Audit Gate</title>
+  <script>(function(){var t=localStorage.getItem('aag-theme');if(t==='light')document.documentElement.classList.add('light');})()</script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+
+<!-- ══ TOP NAV ══ -->
+<header class="topnav">
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="dashboard.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="nab-star">
+        <path d="M50 5L61.2257 39.5491H97.5528L68.1636 60.9017L79.3893 95.4509L50 74.0983L20.6107 95.4509L31.8364 60.9017L2.44717 39.5491H38.7743L50 5Z" fill="#E53935"/>
+      </svg>
+      <span style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.02em;">nab</span>
+      <span style="color:var(--border-3);font-size:18px;font-weight:300;margin:0 2px;">|</span>
+      <span style="font-size:14px;font-weight:700;color:#E53935;letter-spacing:-0.01em;">AI Audit Gate</span>
+    </a>
+  </div>
+  <div class="search-wrap" style="width:280px;">
+    <span class="material-symbols-outlined">search</span>
+    <input type="text" class="search-input" placeholder="Tìm kiếm báo cáo..." />
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;">
+    <button id="langBtn" class="lang-btn" onclick="toggleLang()">VI</button>
+    <button id="themeBtn" class="icon-btn" onclick="toggleTheme()">
+      <span class="material-symbols-outlined" style="font-size:20px;" id="themeIcon">light_mode</span>
+    </button>
+    <button class="icon-btn">
+      <span class="material-symbols-outlined" style="font-size:20px;">notifications</span>
+      <span class="notif-dot"></span>
+    </button>
+    <div style="width:1px;height:28px;background:var(--border);margin:0 4px;"></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="text-align:right;">
+        <p style="font-size:12px;font-weight:600;color:var(--text);line-height:1.3;" data-user-name>Minh Nguyen</p>
+        <p style="font-size:10px;color:var(--text-dim);" data-user-role>BA</p>
+      </div>
+      <div style="width:34px;height:34px;border-radius:50%;background:#E53935;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;" data-user-initials>MN</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ MAIN CONTENT ══ -->
+<main class="main-content fade-in">
+
+  <!-- Page header -->
+  <div class="section-header" style="margin-bottom:28px;">
+    <div>
+      <div class="breadcrumb">
+        <a href="dashboard.html">Dashboard</a>
+        <span class="sep">/</span>
+        <span class="current">Báo cáo</span>
+      </div>
+      <h1 class="page-title" id="pageTitle">Báo cáo kiểm định</h1>
+      <p class="page-sub" id="pageSub">Lịch sử kiểm định tài liệu và kết quả Health Score của bạn</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <!-- Date range filter -->
+      <select class="field" style="padding:7px 10px;font-size:12px;width:auto;cursor:pointer;">
+        <option>Tháng này</option>
+        <option>Tháng trước</option>
+        <option>Quý này</option>
+        <option>Năm nay</option>
+      </select>
+      <button class="btn btn-outline" id="exportBtn" onclick="handleExport()">
+        <span class="material-symbols-outlined">download</span>Xuất CSV
+      </button>
+      <button class="btn btn-primary" id="newReportBtn" onclick="window.location.href='ba-workspace.html'">
+        <span class="material-symbols-outlined">add</span>Kiểm định mới
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SUMMARY STATS ══ -->
+  <div id="summaryStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;">
+    <div class="card stat-card stat-card-accent-left" style="border-left-color:#E53935;padding:18px 20px;">
+      <p style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Tổng kiểm định</p>
+      <p style="font-size:32px;font-weight:800;color:var(--text);letter-spacing:-0.03em;line-height:1;" id="statTotal">24</p>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:4px;"><span class="trend-up">↑ 6</span> so với tháng trước</p>
+    </div>
+    <div class="card stat-card stat-card-accent-left" style="border-left-color:#43A047;padding:18px 20px;">
+      <p style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Đạt chuẩn (≥75)</p>
+      <p style="font-size:32px;font-weight:800;color:#43A047;letter-spacing:-0.03em;line-height:1;" id="statPass">14</p>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">Tỷ lệ <span style="color:#43A047;font-weight:700;" id="statPassPct">58%</span></p>
+    </div>
+    <div class="card stat-card stat-card-accent-left" style="border-left-color:#FB8C00;padding:18px 20px;">
+      <p style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Cần chỉnh sửa</p>
+      <p style="font-size:32px;font-weight:800;color:#FB8C00;letter-spacing:-0.03em;line-height:1;" id="statRevise">10</p>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">Score trung bình <span style="color:#FB8C00;font-weight:700;" id="statAvgScore">68</span>/100</p>
+    </div>
+    <div class="card stat-card stat-card-accent-left" style="border-left-color:#1E88E5;padding:18px 20px;">
+      <p style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Tổng lỗi phát hiện</p>
+      <p style="font-size:32px;font-weight:800;color:#1E88E5;letter-spacing:-0.03em;line-height:1;" id="statErrors">312</p>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:4px;"><span class="trend-up">↓ 23%</span> so với tháng trước</p>
+    </div>
+  </div>
+
+  <!-- ══ AUDIT HISTORY TABLE (F21) — BA & Senior BA ══ -->
+  <div class="card" style="margin-bottom:28px;">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <p style="font-size:13px;font-weight:700;color:var(--text);">Lịch sử kiểm định (F21)</p>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:2px;">Danh sách các lần kiểm định tài liệu SRS của bạn</p>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-chip active" onclick="filterTable(this,'all')">Tất cả</button>
+        <button class="filter-chip" onclick="filterTable(this,'pass')">Đạt chuẩn</button>
+        <button class="filter-chip" onclick="filterTable(this,'fail')">Chưa đạt</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="data-table" id="auditTable">
+        <thead>
+          <tr>
+            <th>Tài liệu SRS</th>
+            <th>Dự án</th>
+            <th>Ngày kiểm định</th>
+            <th>Health Score</th>
+            <th>Cú pháp (F09)</th>
+            <th>Mơ hồ (F10)</th>
+            <th>Mâu thuẫn (F11)</th>
+            <th>Thiếu (F12)</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="auditTableBody">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid var(--border-dim);display:flex;align-items:center;justify-content:space-between;">
+      <p style="font-size:12px;color:var(--text-dim);">Hiển thị 1–8 / 24 kết quả</p>
+      <div style="display:flex;gap:4px;">
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ERROR BREAKDOWN ══ -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;">
+    <!-- Error type distribution -->
+    <div class="card" style="padding:20px;">
+      <p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px;">Phân loại lỗi tích lũy</p>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+            <span style="font-size:12px;color:var(--text-muted);">F09 · Lỗi cú pháp</span>
+            <span style="font-size:12px;font-weight:700;color:#E53935;">96 lỗi · 31%</span>
+          </div>
+          <div class="health-bar"><div class="health-bar-fill" style="width:31%;background:#E53935;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+            <span style="font-size:12px;color:var(--text-muted);">F10 · Ngôn ngữ mơ hồ</span>
+            <span style="font-size:12px;font-weight:700;color:#FB8C00;">134 lỗi · 43%</span>
+          </div>
+          <div class="health-bar"><div class="health-bar-fill" style="width:43%;background:#FB8C00;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+            <span style="font-size:12px;color:var(--text-muted);">F11 · Mâu thuẫn logic</span>
+            <span style="font-size:12px;font-weight:700;color:#FFB300;">38 lỗi · 12%</span>
+          </div>
+          <div class="health-bar"><div class="health-bar-fill" style="width:12%;background:#FFB300;"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+            <span style="font-size:12px;color:var(--text-muted);">F12 · Thiếu thuộc tính</span>
+            <span style="font-size:12px;font-weight:700;color:var(--text-muted);">44 lỗi · 14%</span>
+          </div>
+          <div class="health-bar"><div class="health-bar-fill" style="width:14%;background:var(--text-dim);"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score trend -->
+    <div class="card" style="padding:20px;">
+      <p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Xu hướng Health Score</p>
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:16px;">5 lần kiểm định gần nhất của bạn</p>
+      <div style="display:flex;align-items:flex-end;gap:12px;height:100px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          <span style="font-size:10px;font-weight:700;color:#E53935;">61</span>
+          <div style="width:100%;background:#E53935;border-radius:4px 4px 0 0;" style="height:61px;">
+            <div style="height:61px;background:#E53935;border-radius:4px 4px 0 0;"></div>
+          </div>
+          <span style="font-size:10px;color:var(--text-dim);">21/5</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          <span style="font-size:10px;font-weight:700;color:#FB8C00;">68</span>
+          <div style="width:100%;height:68px;background:#FB8C00;border-radius:4px 4px 0 0;"></div>
+          <span style="font-size:10px;color:var(--text-dim);">22/5</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          <span style="font-size:10px;font-weight:700;color:#FB8C00;">72</span>
+          <div style="width:100%;height:72px;background:#FB8C00;border-radius:4px 4px 0 0;"></div>
+          <span style="font-size:10px;color:var(--text-dim);">22/5</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          <span style="font-size:10px;font-weight:700;color:#43A047;">79</span>
+          <div style="width:100%;height:79px;background:#43A047;border-radius:4px 4px 0 0;"></div>
+          <span style="font-size:10px;color:var(--text-dim);">23/5</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+          <span style="font-size:10px;font-weight:700;color:#43A047;">84</span>
+          <div style="width:100%;height:84px;background:#43A047;border-radius:4px 4px 0 0;"></div>
+          <span style="font-size:10px;color:var(--text-dim);">24/5</span>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px 14px;background:rgba(67,160,71,.06);border:1px solid rgba(67,160,71,.15);border-radius:6px;">
+        <p style="font-size:12px;color:#43A047;font-weight:600;">↑ Cải thiện +23 điểm trong 4 phiên gần nhất — tiếp tục tốt!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SENIOR BA SECTION — approval stats + BA performance ══ -->
+  <div id="sba-section" style="display:none;">
+
+    <!-- Approval stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div class="card stat-card stat-card-accent-left" style="border-left-color:#43A047;padding:18px 20px;">
+        <p style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Đã phê duyệt</p>
+        <p style="font-size:32px;font-weight:800;color:#43A047;letter-spacing:-0.03em;line-height:1;">18</p>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">Tháng này</p>
+      </div>
+      <div class="card stat-card stat-card-accent-left" style="border-left-color:#E53935;padding:18px 20px;">
+        <p style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Yêu cầu sửa</p>
+        <p style="font-size:32px;font-weight:800;color:#E53935;letter-spacing:-0.03em;line-height:1;">6</p>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">Tháng này</p>
+      </div>
+      <div class="card stat-card stat-card-accent-left" style="border-left-color:#FB8C00;padding:18px 20px;">
+        <p style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Đang chờ</p>
+        <p style="font-size:32px;font-weight:800;color:#FB8C00;letter-spacing:-0.03em;line-height:1;">4</p>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+          <a href="approval.html" style="color:#E53935;font-weight:600;">→ Xem danh sách</a>
+        </p>
+      </div>
+      <div class="card stat-card stat-card-accent-left" style="border-left-color:#1E88E5;padding:18px 20px;">
+        <p style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;">Thời gian TB</p>
+        <p style="font-size:32px;font-weight:800;color:#1E88E5;letter-spacing:-0.03em;line-height:1;">1.4</p>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">Ngày / tài liệu</p>
+      </div>
+    </div>
+
+    <!-- BA Performance Table -->
+    <div class="card" style="margin-bottom:28px;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+        <p style="font-size:13px;font-weight:700;color:var(--text);">Hiệu suất BA theo nhóm</p>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:2px;">Tỷ lệ đạt chuẩn và lỗi trung bình mỗi tài liệu của từng BA</p>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>BA</th>
+              <th>Số lần kiểm định</th>
+              <th>Đạt chuẩn</th>
+              <th>Score TB</th>
+              <th>Lỗi cú pháp TB</th>
+              <th>Lỗi mơ hồ TB</th>
+              <th>Xu hướng</th>
+              <th>Cần hỗ trợ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:28px;height:28px;border-radius:50%;background:#E53935;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">MN</div>
+                  <div>
+                    <p style="font-size:12px;font-weight:600;color:var(--text);">Minh Nguyen</p>
+                    <p style="font-size:10px;color:var(--text-dim);">minh.nguyen@nab.com.vn</p>
+                  </div>
+                </div>
+              </td>
+              <td>24</td>
+              <td><span style="color:#43A047;font-weight:700;">14 (58%)</span></td>
+              <td><span style="color:#FB8C00;font-weight:700;">68</span></td>
+              <td>4.0</td>
+              <td>5.6</td>
+              <td><span class="trend-up">↑ Tốt</span></td>
+              <td><span style="color:#43A047;font-size:11px;">—</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:28px;height:28px;border-radius:50%;background:#1E88E5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">AT</div>
+                  <div>
+                    <p style="font-size:12px;font-weight:600;color:var(--text);">Anh Tran</p>
+                    <p style="font-size:10px;color:var(--text-dim);">anh.tran@nab.com.vn</p>
+                  </div>
+                </div>
+              </td>
+              <td>18</td>
+              <td><span style="color:#43A047;font-weight:700;">13 (72%)</span></td>
+              <td><span style="color:#43A047;font-weight:700;">76</span></td>
+              <td>2.8</td>
+              <td>3.1</td>
+              <td><span class="trend-up">↑ Xuất sắc</span></td>
+              <td><span style="color:#43A047;font-size:11px;">—</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:28px;height:28px;border-radius:50%;background:#7B1FA2;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">HL</div>
+                  <div>
+                    <p style="font-size:12px;font-weight:600;color:var(--text);">Hoa Le</p>
+                    <p style="font-size:10px;color:var(--text-dim);">hoa.le@nab.com.vn</p>
+                  </div>
+                </div>
+              </td>
+              <td>11</td>
+              <td><span style="color:#E53935;font-weight:700;">4 (36%)</span></td>
+              <td><span style="color:#E53935;font-weight:700;">59</span></td>
+              <td>7.2</td>
+              <td>9.4</td>
+              <td><span class="trend-down">↓ Cần cải thiện</span></td>
+              <td>
+                <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">
+                  <span class="material-symbols-outlined" style="font-size:14px;">support_agent</span>Hỗ trợ
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:28px;height:28px;border-radius:50%;background:#00897B;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">QP</div>
+                  <div>
+                    <p style="font-size:12px;font-weight:600;color:var(--text);">Quan Pham</p>
+                    <p style="font-size:10px;color:var(--text-dim);">quan.pham@nab.com.vn</p>
+                  </div>
+                </div>
+              </td>
+              <td>15</td>
+              <td><span style="color:#43A047;font-weight:700;">10 (67%)</span></td>
+              <td><span style="color:#43A047;font-weight:700;">74</span></td>
+              <td>3.3</td>
+              <td>4.7</td>
+              <td><span class="trend-flat">→ Ổn định</span></td>
+              <td><span style="color:#43A047;font-size:11px;">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end sba-section -->
+
+</main>
+
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+/* ── Audit history data ── */
+var AUDIT_ROWS = [
+  { doc:'SRS_Mobile_Banking_v1.2.pdf', project:'NAB Mobile Banking v2', date:'24/05/2026', score:72, syn:8,  amb:12, con:3,  mis:5,  pass:false },
+  { doc:'SRS_CoreBanking_v2.0.docx',   project:'Core Banking 2025',     date:'23/05/2026', score:84, syn:2,  amb:4,  con:0,  mis:2,  pass:true  },
+  { doc:'REQ_TradePortal_v3.txt',       project:'Trade Portal',          date:'22/05/2026', score:61, syn:14, amb:18, con:5,  mis:7,  pass:false },
+  { doc:'SRS_OpenBanking_API.pdf',      project:'Open Banking API',      date:'21/05/2026', score:79, syn:4,  amb:7,  con:1,  mis:3,  pass:true  },
+  { doc:'SRS_CardMgmt_v1.0.pdf',        project:'Card Management',       date:'20/05/2026', score:88, syn:1,  amb:3,  con:0,  mis:1,  pass:true  },
+  { doc:'REQ_Remittance_v2.docx',       project:'Cross-Border Remittance',date:'19/05/2026',score:66, syn:9,  amb:11, con:2,  mis:6,  pass:false },
+  { doc:'SRS_CustomerPortal.pdf',       project:'Customer Portal',       date:'18/05/2026', score:91, syn:0,  amb:2,  con:0,  mis:1,  pass:true  },
+  { doc:'SRS_Mobile_Banking_v1.1.pdf',  project:'NAB Mobile Banking v2', date:'17/05/2026', score:58, syn:16, amb:20, con:4,  mis:8,  pass:false },
+];
+
+var currentFilter = 'all';
+
+function scoreColor(s) {
+  if (s >= 75) return '#43A047';
+  if (s >= 60) return '#FB8C00';
+  return '#E53935';
+}
+
+function renderTable(rows) {
+  var tbody = document.getElementById('auditTableBody');
+  tbody.innerHTML = '';
+  rows.forEach(function(r) {
+    var tr = document.createElement('tr');
+    var sc = scoreColor(r.score);
+    tr.innerHTML =
+      '<td style="font-size:12px;font-weight:600;color:var(--text);">' +
+        '<div style="display:flex;align-items:center;gap:7px;">' +
+          '<span class="material-symbols-outlined" style="font-size:16px;color:#E53935;">description</span>' + r.doc +
+        '</div>' +
+      '</td>' +
+      '<td class="muted">' + r.project + '</td>' +
+      '<td class="muted">' + r.date + '</td>' +
+      '<td><span style="font-size:18px;font-weight:800;color:' + sc + ';">' + r.score + '</span><span style="font-size:10px;color:var(--text-dim);">/100</span></td>' +
+      '<td><span style="color:#E53935;font-weight:700;">' + r.syn + '</span></td>' +
+      '<td><span style="color:#FB8C00;font-weight:700;">' + r.amb + '</span></td>' +
+      '<td><span style="color:#FFB300;font-weight:700;">' + r.con + '</span></td>' +
+      '<td><span style="color:var(--text-muted);font-weight:700;">' + r.mis + '</span></td>' +
+      '<td>' + (r.pass
+        ? '<span class="badge badge-approved">Đạt chuẩn</span>'
+        : '<span class="badge badge-revision">Chưa đạt</span>') +
+      '</td>' +
+      '<td>' +
+        '<div style="display:flex;gap:4px;">' +
+          '<a href="audit.html" class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">' +
+            '<span class="material-symbols-outlined" style="font-size:14px;">open_in_new</span>Chi tiết' +
+          '</a>' +
+          '<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="alert(\'Đang tải báo cáo PDF...\');">' +
+            '<span class="material-symbols-outlined" style="font-size:14px;">download</span>' +
+          '</button>' +
+        '</div>' +
+      '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function filterTable(btn, filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var filtered = AUDIT_ROWS;
+  if (filter === 'pass') filtered = AUDIT_ROWS.filter(function(r){ return r.pass; });
+  if (filter === 'fail') filtered = AUDIT_ROWS.filter(function(r){ return !r.pass; });
+  renderTable(filtered);
+}
+
+function handleExport() {
+  alert('Xuất báo cáo CSV thành công!\nFile: audit_report_' + new Date().toISOString().slice(0,10) + '.csv');
+}
+
+/* ── Role-based customization ── */
+(function() {
+  var role = sessionStorage.getItem('userRole') || 'Senior BA';
+
+  /* Show Senior BA section */
+  if (role === 'Senior BA') {
+    document.getElementById('sba-section').style.display = 'block';
+    document.getElementById('pageTitle').textContent = 'Báo cáo kiểm định & Phê duyệt';
+    document.getElementById('pageSub').textContent = 'Tổng hợp kết quả kiểm định và hiệu suất phê duyệt của nhóm BA';
+    /* Update stats to team-level */
+    document.getElementById('statTotal').textContent = '68';
+    document.getElementById('statPass').textContent = '41';
+    document.getElementById('statPassPct').textContent = '60%';
+    document.getElementById('statRevise').textContent = '27';
+    document.getElementById('statAvgScore').textContent = '71';
+    document.getElementById('statErrors').textContent = '847';
+    /* newReportBtn goes to approval for SBA */
+    document.getElementById('newReportBtn').innerHTML =
+      '<span class="material-symbols-outlined">verified_user</span>Xem phê duyệt';
+    document.getElementById('newReportBtn').onclick = function(){ window.location.href = 'approval.html'; };
+  }
+
+  /* Render audit table */
+  renderTable(AUDIT_ROWS);
+})();
+</script>
+</body>
+</html>

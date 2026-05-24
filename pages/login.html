@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — AI Audit Gate</title>
+  <script>(function(){var t=localStorage.getItem('aag-theme');if(t==='light')document.documentElement.classList.add('light');})()</script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body class="login-bg">
+
+  <!-- Theme toggle -->
+  <div style="position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:20;">
+    <button id="themeBtn" class="icon-btn" onclick="toggleTheme()" title="Toggle light mode"
+      style="background:var(--surface);border:1px solid var(--border-2);">
+      <span class="material-symbols-outlined" style="font-size:20px;" id="themeIcon">light_mode</span>
+    </button>
+  </div>
+
+  <!-- Atmospheric orbs -->
+  <div style="position:fixed;inset:0;pointer-events:none;overflow:hidden;">
+    <div style="position:absolute;top:-20%;left:-10%;width:50%;height:50%;background:radial-gradient(circle,rgba(229,57,53,.06) 0%,transparent 65%);border-radius:50%;filter:blur(40px);"></div>
+    <div style="position:absolute;bottom:-20%;right:-10%;width:40%;height:40%;background:radial-gradient(circle,rgba(49,157,182,.04) 0%,transparent 65%);border-radius:50%;filter:blur(40px);"></div>
+  </div>
+
+  <div style="position:relative;z-index:10;width:100%;padding:24px;display:flex;flex-direction:column;align-items:center;">
+
+    <!-- Brand header -->
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:32px;text-align:center;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <svg width="44" height="44" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="nab-star">
+          <path d="M50 5L61.2257 39.5491H97.5528L68.1636 60.9017L79.3893 95.4509L50 74.0983L20.6107 95.4509L31.8364 60.9017L2.44717 39.5491H38.7743L50 5Z" fill="#E53935"/>
+        </svg>
+        <span style="font-size:32px;font-weight:800;color:var(--text);letter-spacing:-0.02em;line-height:1;">nab</span>
+      </div>
+      <h1 style="font-size:26px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:6px;">AI Audit Gate</h1>
+      <p style="font-size:13px;color:var(--text-dim);max-width:300px;line-height:1.5;">Smart SRS requirements audit system — NAB Vietnam</p>
+    </div>
+
+    <!-- Login card -->
+    <div class="login-card fade-in">
+      <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off">
+
+        <!-- Username -->
+        <div style="margin-bottom:18px;">
+          <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;margin-bottom:7px;">Username</label>
+          <div style="position:relative;">
+            <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--text-dim);">person</span>
+            <input type="text" id="usernameInput" class="field field-icon"
+              placeholder="e.g. ba.lananh" autocomplete="username" />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+            <label style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;">Password</label>
+            <a href="#" style="font-size:11px;color:#E53935;font-weight:600;">Forgot password?</a>
+          </div>
+          <div style="position:relative;">
+            <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--text-dim);">lock</span>
+            <input type="password" id="pwdInput" class="field field-icon"
+              placeholder="••••••••" style="padding-right:42px;" autocomplete="current-password" />
+            <button type="button" onclick="togglePwd()"
+              style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-dim);display:flex;align-items:center;" id="eyeBtn">
+              <span class="material-symbols-outlined" style="font-size:18px;">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Error message -->
+        <div id="loginError" style="display:none;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:6px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+          <span class="material-symbols-outlined" style="font-size:16px;color:#E53935;flex-shrink:0;">error</span>
+          <p id="loginErrorMsg" style="font-size:12px;color:#E53935;font-weight:500;"></p>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" id="submitBtn" class="btn btn-primary"
+          style="width:100%;justify-content:center;padding:11px 20px;font-size:14px;border-radius:8px;">
+          <span class="material-symbols-outlined" style="font-size:18px;">login</span>
+          Sign In
+        </button>
+
+      </form>
+
+    </div>
+
+    <!-- Footer -->
+    <div style="margin-top:28px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;">
+      <div id="serverStatus" style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);">
+        <span style="width:7px;height:7px;border-radius:50%;background:var(--text-subtle);display:inline-block;" id="statusDot"></span>
+        <span id="statusText">Checking server…</span>
+      </div>
+      <div style="display:flex;gap:20px;">
+        <a href="#" style="font-size:11px;color:var(--text-faint);">Terms of Use</a>
+        <a href="#" style="font-size:11px;color:var(--text-faint);">Support</a>
+        <a href="#" style="font-size:11px;color:var(--text-faint);">v1.0.0</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../assets/js/app.js"></script>
+  <script>
+    /* ── Redirect if already logged in ── */
+    (function() {
+      var token = localStorage.getItem('aag-token');
+      var raw   = localStorage.getItem('aag-user');
+      if (token && raw) {
+        try {
+          var user = JSON.parse(raw);
+          var role = user.role;
+          var dest = role === 'BA' ? 'ba-workspace.html'
+                   : role === 'PM' ? 'dashboard.html'
+                   : 'dashboard.html';
+          window.location.href = dest;
+        } catch (_) {}
+      }
+    })();
+
+    /* ── Server health check ── */
+    (function() {
+      fetch('http://localhost:3001/api/health')
+        .then(function(r) { return r.json(); })
+        .then(function() {
+          document.getElementById('statusDot').style.background  = '#43A047';
+          document.getElementById('statusText').textContent = 'System running';
+        })
+        .catch(function() {
+          document.getElementById('statusDot').style.background  = '#E53935';
+          document.getElementById('statusText').textContent = 'Cannot reach server — start backend first';
+        });
+    })();
+
+    /* ── Fill demo credentials ── */
+    function fillCreds(username, password) {
+      document.getElementById('usernameInput').value = username;
+      document.getElementById('pwdInput').value      = password;
+      document.getElementById('usernameInput').focus();
+      hideError();
+    }
+
+    /* ── Toggle password visibility ── */
+    function togglePwd() {
+      var input = document.getElementById('pwdInput');
+      var icon  = document.querySelector('#eyeBtn .material-symbols-outlined');
+      if (input.type === 'password') { input.type = 'text';     icon.textContent = 'visibility_off'; }
+      else                           { input.type = 'password'; icon.textContent = 'visibility'; }
+    }
+
+    /* ── Error display helpers ── */
+    function showError(msg) {
+      document.getElementById('loginErrorMsg').textContent = msg;
+      document.getElementById('loginError').style.display = 'flex';
+    }
+    function hideError() {
+      document.getElementById('loginError').style.display = 'none';
+    }
+
+    /* ── Handle login ── */
+    async function handleLogin(e) {
+      e.preventDefault();
+      hideError();
+
+      var username = document.getElementById('usernameInput').value.trim();
+      var password = document.getElementById('pwdInput').value;
+
+      if (!username || !password) {
+        showError('Please enter your username and password.');
+        return;
+      }
+
+      var btn = document.getElementById('submitBtn');
+      btn.innerHTML = '<span class="material-symbols-outlined spin" style="font-size:18px;">progress_activity</span> Signing in…';
+      btn.disabled  = true;
+
+      try {
+        var res = await fetch('http://localhost:3001/api/auth/login', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ username, password }),
+        });
+        var data = await res.json();
+
+        if (!res.ok) {
+          showError(data.error || 'Invalid username or password.');
+          btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">login</span> Sign In';
+          btn.disabled  = false;
+          return;
+        }
+
+        /* ── Success: store token + user ── */
+        localStorage.setItem('aag-token', data.token);
+        localStorage.setItem('aag-user',  JSON.stringify(data.user));
+        sessionStorage.setItem('userRole', data.user.role === 'SENIOR_BA' ? 'Senior BA' : data.user.role);
+        sessionStorage.setItem('userName', data.user.fullName);
+
+        /* ── Role-based redirect ── */
+        var roleHome = {
+          'BA':        'ba-workspace.html',
+          'SENIOR_BA': 'dashboard.html',
+          'PM':        'dashboard.html',
+        };
+        btn.innerHTML = '<span class="material-symbols-outlined spin" style="font-size:18px;">progress_activity</span> Redirecting…';
+        window.location.href = roleHome[data.user.role] || 'dashboard.html';
+
+      } catch (err) {
+        showError('Cannot connect to server. Make sure the backend is running (npm run dev).');
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">login</span> Sign In';
+        btn.disabled  = false;
+      }
+    }
+  </script>
+</body>
+</html>

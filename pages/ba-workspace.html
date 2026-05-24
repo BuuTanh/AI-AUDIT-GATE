@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Workspace — AI Audit Gate</title>
+  <script>(function(){var t=localStorage.getItem('aag-theme');if(t==='light')document.documentElement.classList.add('light');})()</script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
+</head>
+<body>
+
+<!-- ══ TOP NAV ══ -->
+<header class="topnav">
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="ba-workspace.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="nab-star">
+        <path d="M50 5L61.2257 39.5491H97.5528L68.1636 60.9017L79.3893 95.4509L50 74.0983L20.6107 95.4509L31.8364 60.9017L2.44717 39.5491H38.7743L50 5Z" fill="#E53935"/>
+      </svg>
+      <span style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.02em;">nab</span>
+      <span style="color:var(--border-3);font-size:18px;font-weight:300;margin:0 2px;">|</span>
+      <span style="font-size:14px;font-weight:700;color:#E53935;letter-spacing:-0.01em;">AI Audit Gate</span>
+    </a>
+  </div>
+  <!-- ReqBrain status -->
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div id="aiStatusBadge" style="display:inline-flex;align-items:center;gap:7px;background:rgba(100,100,100,.08);border:1px solid rgba(100,100,100,.2);border-radius:20px;padding:5px 13px;">
+      <span id="aiStatusDot" style="width:6px;height:6px;border-radius:50%;background:#999;display:inline-block;"></span>
+      <span id="aiStatusText" style="font-size:11px;font-weight:700;color:#999;letter-spacing:0.03em;">Checking ReqBrain…</span>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;">
+    <button id="langBtn" class="lang-btn" onclick="toggleLang()" title="Đổi ngôn ngữ / Switch language">VI</button>
+    <button id="themeBtn" class="icon-btn" onclick="toggleTheme()" title="Chế độ sáng / Light mode">
+      <span class="material-symbols-outlined" style="font-size:20px;" id="themeIcon">light_mode</span>
+    </button>
+    <button class="icon-btn">
+      <span class="material-symbols-outlined" style="font-size:20px;">notifications</span>
+      <span class="notif-dot"></span>
+    </button>
+    <div style="width:1px;height:28px;background:var(--border);margin:0 4px;"></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="text-align:right;">
+        <p style="font-size:12px;font-weight:600;color:var(--text);line-height:1.3;" data-user-name>Minh Nguyen</p>
+        <p style="font-size:10px;color:var(--text-dim);" data-user-role>BA</p>
+      </div>
+      <div style="width:34px;height:34px;border-radius:50%;background:#E53935;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;" data-user-initials>MN</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ WORKSPACE SHELL ══ -->
+<div class="ws-shell">
+
+  <!-- ── Icon Navigation (56px) ── -->
+  <nav class="ws-icon-nav">
+    <a href="ba-workspace.html" class="ws-icon-btn active" data-tip="AI Workspace">
+      <span class="material-symbols-outlined">smart_toy</span>
+    </a>
+    <a href="dashboard.html" class="ws-icon-btn" data-tip="Dashboard">
+      <span class="material-symbols-outlined">dashboard</span>
+    </a>
+    <a href="projects.html" class="ws-icon-btn" data-tip="Projects">
+      <span class="material-symbols-outlined">folder_copy</span>
+    </a>
+    <a href="reports.html" class="ws-icon-btn" data-tip="Reports">
+      <span class="material-symbols-outlined">analytics</span>
+    </a>
+    <div style="flex:1;"></div>
+    <a href="#" class="ws-icon-btn" data-tip="Settings">
+      <span class="material-symbols-outlined">settings</span>
+    </a>
+    <a href="login.html" class="ws-icon-btn" data-tip="Sign Out" data-action="logout">
+      <span class="material-symbols-outlined">logout</span>
+    </a>
+  </nav>
+
+  <!-- ── Sessions Sidebar (240px) ── -->
+  <aside class="ws-sessions">
+    <div class="ws-sessions-top">
+      <button class="ws-new-btn" onclick="newSession()">
+        <span class="material-symbols-outlined" style="font-size:16px;">add</span>
+        New Session
+      </button>
+    </div>
+    <!-- Mode tabs -->
+    <div class="ws-mode-tabs">
+      <button class="ws-mode-tab active" id="tab-create" onclick="switchMode('create')">✏️ Create Req</button>
+      <button class="ws-mode-tab" id="tab-audit" onclick="switchMode('audit')">🔍 Audit</button>
+    </div>
+    <p class="ws-section-label" id="sessionLabel">Recent Sessions</p>
+    <div class="ws-session-list" id="sessionList"></div>
+  </aside>
+
+  <!-- ── Chat Area ── -->
+  <main class="ws-chat">
+    <div class="ws-chat-messages" id="chatMessages"></div>
+
+    <div class="ws-chat-footer">
+      <!-- Upload zone (shown in audit mode) -->
+      <div id="uploadZone" class="ws-upload-zone" style="display:none;" onclick="document.getElementById('fileInput').click()">
+        <span class="material-symbols-outlined" style="color:#E53935;font-size:22px;">upload_file</span>
+        <span>Drag & drop SRS document or <strong>click to choose file</strong></span>
+        <span style="color:var(--text-dim);margin-left:auto;font-size:11px;">PDF · DOCX · TXT</span>
+        <input type="file" id="fileInput" style="display:none;" accept=".pdf,.docx,.txt" onchange="handleFileSelect(this)" />
+      </div>
+      <div id="fileChipArea" style="display:none;margin-bottom:10px;"></div>
+      <!-- Input row -->
+      <div class="ws-input-row">
+        <textarea class="ws-textarea" id="chatInput" rows="1"
+          placeholder="Describe a feature, paste raw User Stories, or enter a single requirement…"
+          oninput="autoGrow(this)" onkeydown="handleInputKey(event)"></textarea>
+        <button class="ws-send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+          <span class="material-symbols-outlined">arrow_upward</span>
+        </button>
+      </div>
+      <p class="ws-hint">Ctrl + Enter to send &nbsp;·&nbsp; Model: ReqBrain (reelicit_-_zephyr-7b-beta-reqbrain)</p>
+    </div>
+  </main>
+</div>
+
+<!-- ══ PROJECT PICKER MODAL ══ -->
+<div id="projectPickerModal" style="display:none;" class="modal-overlay"
+     onclick="if(event.target===this)closeProjectPicker()">
+  <div class="modal-card" style="max-height:82vh;display:flex;flex-direction:column;overflow:hidden;">
+    <h3>Save to Project</h3>
+    <p>Select a project to commit these requirements to:</p>
+    <div id="projectPickerList" style="overflow-y:auto;flex:1;min-height:0;margin:8px 0;">
+      <!-- rendered by JS -->
+    </div>
+    <div class="ai-action-bar" style="margin-top:16px;flex-shrink:0;">
+      <button class="ai-act-btn primary" id="confirmSaveBtn" onclick="confirmSave()" disabled>
+        <span class="material-symbols-outlined">save</span>Save
+      </button>
+      <button class="ai-act-btn" onclick="closeProjectPicker()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/ba-workspace.js"></script>
+</body>
+</html>

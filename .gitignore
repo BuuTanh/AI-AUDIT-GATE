@@ -1,0 +1,11 @@
+# Backend
+backend/node_modules/
+backend/.env
+backend/uploads/
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+# System
+.DS_Store
+Thumbs.db
+*.log

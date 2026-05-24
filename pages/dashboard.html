@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — AI Audit Gate</title>
+  <script>(function(){var t=localStorage.getItem('aag-theme');if(t==='light')document.documentElement.classList.add('light');})()</script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+
+<!-- ══ TOP NAV ══ -->
+<header class="topnav">
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="dashboard.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="nab-star">
+        <path d="M50 5L61.2257 39.5491H97.5528L68.1636 60.9017L79.3893 95.4509L50 74.0983L20.6107 95.4509L31.8364 60.9017L2.44717 39.5491H38.7743L50 5Z" fill="#E53935"/>
+      </svg>
+      <span style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.02em;">nab</span>
+      <span style="color:var(--border-3);font-size:18px;font-weight:300;margin:0 2px;">|</span>
+      <span style="font-size:14px;font-weight:700;color:#E53935;letter-spacing:-0.01em;">AI Audit Gate</span>
+    </a>
+  </div>
+  <div class="search-wrap" style="width:280px;">
+    <span class="material-symbols-outlined">search</span>
+    <input type="text" class="search-input" placeholder="Search projects, requirements…" />
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;">
+    <button id="langBtn" class="lang-btn" onclick="toggleLang()" title="Switch language">EN</button>
+    <button id="themeBtn" class="icon-btn" onclick="toggleTheme()" title="Toggle light mode">
+      <span class="material-symbols-outlined" style="font-size:20px;" id="themeIcon">light_mode</span>
+    </button>
+    <button class="icon-btn">
+      <span class="material-symbols-outlined" style="font-size:20px;">notifications</span>
+      <span class="notif-dot"></span>
+    </button>
+    <div style="width:1px;height:28px;background:var(--border);margin:0 4px;"></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="text-align:right;">
+        <p style="font-size:12px;font-weight:600;color:var(--text);line-height:1.3;" data-user-name>Minh Nguyen</p>
+        <p style="font-size:10px;color:var(--text-dim);" data-user-role>Senior BA</p>
+      </div>
+      <div style="width:34px;height:34px;border-radius:50%;background:#E53935;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;" data-user-initials>MN</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div style="padding:12px 8px 12px;margin-bottom:4px;">
+    <div style="display:flex;align-items:center;gap:10px;padding:0 6px;">
+      <div style="width:32px;height:32px;background:#E53935;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:#fff;">account_balance</span>
+      </div>
+      <div>
+        <p style="font-size:12px;font-weight:700;color:var(--text);line-height:1.2;">NAB Vietnam</p>
+        <p style="font-size:10px;color:var(--text-dim);letter-spacing:0.06em;text-transform:uppercase;">Audit Division</p>
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <nav style="flex:1;display:flex;flex-direction:column;gap:2px;">
+    <a href="dashboard.html" class="nav-link active" data-page="dashboard.html">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="projects.html" class="nav-link" data-page="projects.html">
+      <span class="material-symbols-outlined">folder_copy</span>
+      <span>Projects</span>
+    </a>
+    <a href="reports.html" class="nav-link" data-page="reports.html">
+      <span class="material-symbols-outlined">analytics</span>
+      <span>Reports</span>
+    </a>
+  </nav>
+  <div class="divider"></div>
+  <div style="display:flex;flex-direction:column;gap:2px;">
+    <a href="#" class="nav-link">
+      <span class="material-symbols-outlined">settings</span>
+      <span>Settings</span>
+    </a>
+    <a href="login.html" class="nav-link" data-action="logout">
+      <span class="material-symbols-outlined">logout</span>
+      <span>Sign Out</span>
+    </a>
+  </div>
+</aside>
+
+<!-- ══ MAIN CONTENT ══ -->
+<main class="main-content fade-in">
+
+  <!-- ══════════════════════════════════════════════════
+       PM VIEW (F22) — shown only for PM role
+  ══════════════════════════════════════════════════ -->
+  <div id="pm-view" style="display:none;">
+
+    <!-- Section header -->
+    <div class="section-header">
+      <div>
+        <h1 class="page-title">SRS Quality Statistics</h1>
+        <p class="page-sub">F22 · Aggregate health score and document status per project — NAB Vietnam</p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost"><span class="material-symbols-outlined">calendar_today</span> Q2 2025</button>
+        <button class="btn btn-primary"><span class="material-symbols-outlined">bar_chart</span> Export Report</button>
+      </div>
+    </div>
+
+    <!-- 4 KPI stat cards -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
+
+      <!-- 1. Avg Health Score -->
+      <div class="card" style="padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;">Avg Health Score</span>
+          <span class="material-symbols-outlined" style="font-size:20px;color:var(--text-dim);">favorite</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="font-size:40px;font-weight:800;color:var(--text);letter-spacing:-0.03em;line-height:1;">69</span>
+          <span style="font-size:12px;color:#43A047;font-weight:600;">↑ +6 vs Q1</span>
+        </div>
+        <div class="health-bar" style="margin-top:12px;"><div class="health-bar-fill" style="width:69%;background:#E53935;"></div></div>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:8px;">Team average across 6 projects</p>
+      </div>
+
+      <!-- 2. Projects passing threshold -->
+      <div class="card" style="padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;">Passing ≥75</span>
+          <span class="material-symbols-outlined" style="font-size:20px;color:#43A047;">verified</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="font-size:40px;font-weight:800;color:#43A047;letter-spacing:-0.03em;line-height:1;">3</span>
+          <span style="font-size:12px;color:var(--text-muted);font-weight:500;">/ 6 projects</span>
+        </div>
+        <div class="health-bar" style="margin-top:12px;"><div class="health-bar-fill" style="width:50%;background:#43A047;"></div></div>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:8px;">Meeting submission threshold</p>
+      </div>
+
+      <!-- 3. Docs pending Senior BA review -->
+      <div class="card" style="padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;">Pending Review</span>
+          <span class="material-symbols-outlined" style="font-size:20px;color:#FB8C00;">pending_actions</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="font-size:40px;font-weight:800;color:#FB8C00;letter-spacing:-0.03em;line-height:1;">4</span>
+          <span style="font-size:12px;color:var(--text-muted);font-weight:500;">documents</span>
+        </div>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:22px;">Awaiting Senior BA approval</p>
+      </div>
+
+      <!-- 4. Total open issues -->
+      <div class="card stat-card-accent-left" style="padding:20px;border-left-color:#E53935;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;">Open Issues</span>
+          <span class="material-symbols-outlined" style="font-size:20px;color:#E53935;">bug_report</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="font-size:40px;font-weight:800;color:#E53935;letter-spacing:-0.03em;line-height:1;">106</span>
+          <span style="font-size:12px;color:#E53935;font-weight:600;">↓ −18 vs Q1</span>
+        </div>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:22px;">Across all active projects</p>
+      </div>
+
+    </div><!-- /4 KPI cards -->
+
+    <!-- Dual-panel: Health Score bars + Issues distribution -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+
+      <!-- Left panel: Health Score by Project -->
+      <div class="card" style="padding:24px;">
+        <p style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;margin-bottom:20px;">Health Score by Project</p>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- Retail Loan Engine: 90 -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;color:var(--text);font-weight:500;">Retail Loan Engine</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:#43A047;font-weight:600;">↑ +5</span>
+                <span style="font-size:13px;font-weight:800;color:#43A047;">90</span>
+              </div>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:90%;background:#43A047;"></div></div>
+          </div>
+
+          <!-- NAB Mobile Banking v2: 85 -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;color:var(--text);font-weight:500;">NAB Mobile Banking v2</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:#43A047;font-weight:600;">↑ +7</span>
+                <span style="font-size:13px;font-weight:800;color:#43A047;">85</span>
+              </div>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:85%;background:#43A047;"></div></div>
+          </div>
+
+          <!-- Customer 360 View: 80 -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;color:var(--text);font-weight:500;">Customer 360 View</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:var(--text-dim);font-weight:500;">→ 0</span>
+                <span style="font-size:13px;font-weight:800;color:#43A047;">80</span>
+              </div>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:80%;background:#43A047;"></div></div>
+          </div>
+
+          <!-- Core Banking Upgrade 2.0: 74 -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;color:var(--text);font-weight:500;">Core Banking Upgrade 2.0</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:#43A047;font-weight:600;">↑ +3</span>
+                <span style="font-size:13px;font-weight:800;color:#FFC107;">74</span>
+              </div>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:74%;background:#FFC107;"></div></div>
+          </div>
+
+          <!-- Corporate IDAM: 55 — below threshold -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:12px;color:var(--text);font-weight:500;">Corporate IDAM</span>
+                <span style="font-size:10px;background:rgba(229,57,53,.12);color:#E53935;padding:1px 5px;border-radius:3px;font-weight:700;line-height:1.6;">below</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:#43A047;font-weight:600;">↑ +2</span>
+                <span style="font-size:13px;font-weight:800;color:#E53935;">55</span>
+              </div>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:55%;background:#E53935;"></div></div>
+          </div>
+
+          <!-- TradePortal Migration: 30 — critical -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:12px;color:var(--text);font-weight:500;">TradePortal Migration</span>
+                <span style="font-size:10px;background:rgba(229,57,53,.14);color:#E53935;padding:1px 5px;border-radius:3px;font-weight:700;line-height:1.6;">critical</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:#E53935;font-weight:600;">↓ −12</span>
+                <span style="font-size:13px;font-weight:800;color:#E53935;">30</span>
+              </div>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:30%;background:#E53935;"></div></div>
+          </div>
+
+        </div>
+        <!-- Legend -->
+        <div style="display:flex;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border-dim);">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);">
+            <span style="width:8px;height:8px;border-radius:2px;background:#43A047;flex-shrink:0;"></span>≥75 Passing
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);">
+            <span style="width:8px;height:8px;border-radius:2px;background:#FFC107;flex-shrink:0;"></span>60–74 Review
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);">
+            <span style="width:8px;height:8px;border-radius:2px;background:#E53935;flex-shrink:0;"></span>&lt;60 Critical
+          </div>
+        </div>
+      </div>
+
+      <!-- Right panel: Open Issues distribution -->
+      <div class="card" style="padding:24px;">
+        <p style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text-dim);text-transform:uppercase;margin-bottom:20px;">Open Issues by Project</p>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;color:var(--text);font-weight:500;">TradePortal Migration</span>
+              <span style="font-size:12px;font-weight:700;color:#E53935;">48</span>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:100%;background:#E53935;"></div></div>
+          </div>
+
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;color:var(--text);font-weight:500;">Core Banking Upgrade 2.0</span>
+              <span style="font-size:12px;font-weight:700;color:#FB8C00;">34</span>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:71%;background:#FB8C00;"></div></div>
+          </div>
+
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;color:var(--text);font-weight:500;">Corporate IDAM</span>
+              <span style="font-size:12px;font-weight:700;color:#FFC107;">15</span>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:31%;background:#FFC107;"></div></div>
+          </div>
+
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;color:var(--text);font-weight:500;">Customer 360 View</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text-muted);">5</span>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:10%;background:var(--text-subtle);"></div></div>
+          </div>
+
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;color:var(--text);font-weight:500;">NAB Mobile Banking v2</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text-muted);">3</span>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:6%;background:var(--text-subtle);"></div></div>
+          </div>
+
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <span style="font-size:12px;color:var(--text);font-weight:500;">Retail Loan Engine</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text-muted);">1</span>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:2%;background:var(--text-subtle);"></div></div>
+          </div>
+
+        </div>
+        <!-- Total summary -->
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-dim);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;color:var(--text-dim);">Total open issues</span>
+          <span style="font-size:16px;font-weight:800;color:#E53935;">106</span>
+        </div>
+      </div>
+
+    </div><!-- /dual panel -->
+
+    <!-- Project quality table -->
+    <div class="card" style="overflow:hidden;margin-bottom:20px;">
+      <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h3 style="font-size:16px;font-weight:700;color:var(--text);">Project Quality Summary</h3>
+          <p style="font-size:11px;color:var(--text-dim);margin-top:2px;">F22 · Read-only view for Project Manager</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span style="font-size:11px;color:var(--text-dim);">Updated: 24 May 2025</span>
+          <a href="projects.html" style="font-size:12px;font-weight:600;color:#E53935;text-decoration:none;">View in Projects →</a>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Team</th>
+              <th>BA Lead</th>
+              <th>Health Score</th>
+              <th>Trend (Q2)</th>
+              <th>Open Issues</th>
+              <th>Status</th>
+              <th>Last Audit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">Retail Loan Engine</td>
+              <td class="muted">Credit Risk Tech</td>
+              <td class="muted">Bảo Châu</td>
+              <td><span class="badge badge-approved">90/100</span></td>
+              <td><span class="trend-up">↑ +5</span></td>
+              <td class="muted">1</td>
+              <td><span class="badge badge-approved"><span class="dot"></span>Approved</span></td>
+              <td class="muted">22 May</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">NAB Mobile Banking v2</td>
+              <td class="muted">Digital Banking Core</td>
+              <td class="muted">Lan Anh</td>
+              <td><span class="badge badge-approved">85/100</span></td>
+              <td><span class="trend-up">↑ +7</span></td>
+              <td class="muted">3</td>
+              <td><span class="badge badge-approved"><span class="dot"></span>Approved</span></td>
+              <td class="muted">20 May</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Customer 360 View</td>
+              <td class="muted">Data Engineering</td>
+              <td class="muted">Minh Tú</td>
+              <td><span class="badge badge-approved">80/100</span></td>
+              <td><span class="trend-flat">→ 0</span></td>
+              <td class="muted">5</td>
+              <td><span class="badge badge-approved"><span class="dot"></span>Approved</span></td>
+              <td class="muted">18 May</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Core Banking Upgrade 2.0</td>
+              <td class="muted">Core Infrastructure</td>
+              <td class="muted">Tùng Dương</td>
+              <td><span class="badge badge-revision">74/100</span></td>
+              <td><span class="trend-up">↑ +3</span></td>
+              <td style="color:#FB8C00;font-weight:600;">34</td>
+              <td><span class="badge badge-auditing"><span class="dot"></span>In Audit</span></td>
+              <td class="muted">21 May</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Corporate IDAM</td>
+              <td class="muted">Security Ops</td>
+              <td class="muted">Hoàng Nam</td>
+              <td><span class="badge badge-revision">55/100</span></td>
+              <td><span class="trend-up">↑ +2</span></td>
+              <td style="color:#FB8C00;font-weight:600;">15</td>
+              <td><span class="badge badge-auditing"><span class="dot"></span>In Audit</span></td>
+              <td class="muted">19 May</td>
+            </tr>
+            <tr style="background:rgba(229,57,53,.04);">
+              <td style="font-weight:600;">TradePortal Migration</td>
+              <td class="muted">Capital Markets</td>
+              <td class="muted">Mai Linh</td>
+              <td><span class="badge badge-expired">30/100</span></td>
+              <td><span class="trend-down">↓ −12</span></td>
+              <td style="color:#E53935;font-weight:700;">48</td>
+              <td><span class="badge badge-revision"><span class="dot pulse-dot"></span>Needs Revision</span></td>
+              <td class="muted">15 May</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Alert callouts for at-risk projects -->
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="background:rgba(229,57,53,.05);border:1px solid rgba(229,57,53,.18);border-radius:8px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;">
+        <span class="material-symbols-outlined" style="color:#E53935;font-size:20px;flex-shrink:0;margin-top:1px;">error</span>
+        <div>
+          <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">TradePortal Migration requires immediate intervention</p>
+          <p style="font-size:12px;color:var(--text-muted);">Health Score 30/100 — below submission threshold (min 75). 48 open issues, trend −12 pts Q2. Request BA to complete revisions before moving to Sprint 4.</p>
+        </div>
+      </div>
+      <div style="background:rgba(251,140,0,.05);border:1px solid rgba(251,140,0,.18);border-radius:8px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;">
+        <span class="material-symbols-outlined" style="color:#FB8C00;font-size:20px;flex-shrink:0;margin-top:1px;">warning</span>
+        <div>
+          <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Corporate IDAM approaching threshold</p>
+          <p style="font-size:12px;color:var(--text-muted);">Health Score 55/100 with 15 open issues. Trending up (+2 pts) but still 20 points below threshold. Monitor closely and check audit progress.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- ══ END PM VIEW ══ -->
+
+  <!-- ══════════════════════════════════════════════════
+       SENIOR BA CALLOUT — pending approvals banner
+  ══════════════════════════════════════════════════ -->
+  <div id="sba-callout" style="display:none;margin-bottom:20px;">
+    <div style="background:rgba(229,57,53,.06);border:1px solid rgba(229,57,53,.2);border-radius:10px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="material-symbols-outlined" style="color:#E53935;font-size:24px;">pending_actions</span>
+        <div>
+          <p style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;">4 SRS documents are waiting for your approval</p>
+          <p style="font-size:12px;color:var(--text-muted);">Oldest document submitted 2 days ago · Health Score passed threshold</p>
+        </div>
+      </div>
+      <a href="projects.html" class="btn btn-primary">
+        <span class="material-symbols-outlined">folder_copy</span> Go to Projects
+      </a>
+    </div>
+  </div>
+  <!-- ══ END SENIOR BA CALLOUT ══ -->
+
+  <!-- ══════════════════════════════════════════════════
+       DEFAULT VIEW — BA + Senior BA
+  ══════════════════════════════════════════════════ -->
+  <div id="default-view">
+
+    <!-- Page header -->
+    <div class="section-header">
+      <div>
+        <h1 class="page-title">SRS Health Dashboard</h1>
+        <p class="page-sub">Overview of the software requirements audit system — NAB Vietnam</p>
+      </div>
+      <div style="display:flex;gap:8px;" id="dashHeaderActions">
+        <button class="btn btn-ghost">
+          <span class="material-symbols-outlined">calendar_today</span> This month
+        </button>
+        <button class="btn btn-primary">
+          <span class="material-symbols-outlined">download</span> Export Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Row 1: Stat Cards -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
+
+      <div class="card" style="padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <span style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;">Total Projects</span>
+          <span class="material-symbols-outlined" style="font-size:20px;color:var(--text-dim);">list_alt</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="font-size:40px;font-weight:800;color:var(--text);letter-spacing:-0.03em;line-height:1;">6</span>
+          <span style="font-size:12px;color:#43A047;font-weight:600;">↑ +1 this month</span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <span style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;">In Audit</span>
+          <span class="material-symbols-outlined" style="font-size:20px;color:#72D4EF;">sync</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:40px;font-weight:800;color:#72D4EF;letter-spacing:-0.03em;line-height:1;">2</span>
+          <div style="flex:1;">
+            <div class="health-bar" style="margin-bottom:4px;">
+              <div class="health-bar-fill" style="width:33%;background:#72D4EF;"></div>
+            </div>
+            <span style="font-size:11px;color:var(--text-dim);">33% of total</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <span style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;">Approved</span>
+          <span class="material-symbols-outlined" style="font-size:20px;color:#43A047;">verified</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="font-size:40px;font-weight:800;color:var(--text);letter-spacing:-0.03em;line-height:1;">3</span>
+          <span style="font-size:12px;color:var(--text-muted);font-weight:500;">50% complete</span>
+        </div>
+      </div>
+
+      <div class="card stat-card-accent-left" style="padding:20px;border-left-color:#E53935;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+          <span style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;">Needs Revision</span>
+          <span class="material-symbols-outlined" style="font-size:20px;color:#E53935;">warning</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="font-size:40px;font-weight:800;color:#E53935;letter-spacing:-0.03em;line-height:1;">1</span>
+          <span class="pulse-dot" style="font-size:12px;color:#E53935;font-weight:600;">High priority</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 2: Charts -->
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:20px;">
+
+      <!-- Donut chart: avg health score -->
+      <div class="card" style="padding:24px;display:flex;flex-direction:column;align-items:center;">
+        <p style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;align-self:flex-start;margin-bottom:20px;">Average Health Score</p>
+        <div class="health-gauge-wrap" style="width:140px;height:140px;margin-bottom:20px;">
+          <svg width="140" height="140" class="gauge-ring">
+            <circle cx="70" cy="70" r="55" stroke-width="10" class="gauge-track" />
+            <!-- score 69/100: dashoffset = 345.6*(1-0.69) = 107.1 -->
+            <circle cx="70" cy="70" r="55" stroke-width="10"
+              stroke="#E53935" stroke-dasharray="345.6" stroke-dashoffset="107.1"
+              class="gauge-arc" />
+          </svg>
+          <div class="gauge-label">
+            <span style="font-size:36px;font-weight:800;color:var(--text);letter-spacing:-0.03em;line-height:1;">69</span>
+            <span style="font-size:11px;color:var(--text-dim);">/100</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;">
+          <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-muted);">
+            <span style="width:8px;height:8px;border-radius:50%;background:#E53935;flex-shrink:0;"></span>
+            Good quality
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-dim);">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--border-2);flex-shrink:0;"></span>
+            Room to improve
+          </div>
+        </div>
+      </div>
+
+      <!-- Bar chart: error distribution -->
+      <div class="card" style="padding:24px;">
+        <p style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;margin-bottom:22px;">Issues by Type</p>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+              <span style="font-size:13px;color:var(--text);font-weight:500;">Syntax errors</span>
+              <span style="font-size:12px;font-weight:700;color:#E53935;">42 issues</span>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:70%;background:#E53935;"></div></div>
+          </div>
+
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+              <span style="font-size:13px;color:var(--text);font-weight:500;">Ambiguous language</span>
+              <span style="font-size:12px;font-weight:700;color:#FFB300;">28 issues</span>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:47%;background:#FFB300;"></div></div>
+          </div>
+
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+              <span style="font-size:13px;color:var(--text);font-weight:500;">Logic conflicts</span>
+              <span style="font-size:12px;font-weight:700;color:#FFA726;">15 issues</span>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:25%;background:#FB8C00;"></div></div>
+          </div>
+
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+              <span style="font-size:13px;color:var(--text);font-weight:500;">Missing required fields</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text-muted);">9 issues</span>
+            </div>
+            <div class="health-bar"><div class="health-bar-fill" style="width:15%;background:var(--text-subtle);"></div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Projects Summary Table -->
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <h3 style="font-size:16px;font-weight:700;color:var(--text);">Project Summary</h3>
+        <a href="projects.html" style="font-size:12px;font-weight:600;color:#E53935;text-decoration:none;">View all →</a>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Project Name</th>
+              <th>BA Lead</th>
+              <th>Health Score</th>
+              <th>Total Req.</th>
+              <th>Open Issues</th>
+              <th>Status</th>
+              <th style="text-align:right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">Retail Loan Engine</td>
+              <td class="muted">Bảo Châu</td>
+              <td><span class="badge badge-approved">90/100</span></td>
+              <td class="muted">98</td>
+              <td class="muted">1</td>
+              <td><span class="badge badge-approved"><span class="dot"></span>Approved</span></td>
+              <td style="text-align:right;"><a href="projects.html" style="color:var(--text-muted);display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:12px;font-weight:600;text-decoration:none;transition:color 0.15s;" onmouseover="this.style.color='#E53935'" onmouseout="this.style.color=''"><span class="material-symbols-outlined" style="font-size:16px;">visibility</span>View</a></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">NAB Mobile Banking v2</td>
+              <td class="muted">Lan Anh</td>
+              <td><span class="badge badge-approved">85/100</span></td>
+              <td class="muted">142</td>
+              <td class="muted">3</td>
+              <td><span class="badge badge-approved"><span class="dot"></span>Approved</span></td>
+              <td style="text-align:right;"><a href="projects.html" style="color:var(--text-muted);display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:12px;font-weight:600;text-decoration:none;transition:color 0.15s;" onmouseover="this.style.color='#E53935'" onmouseout="this.style.color=''"><span class="material-symbols-outlined" style="font-size:16px;">visibility</span>View</a></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Core Banking Upgrade 2.0</td>
+              <td class="muted">Tùng Dương</td>
+              <td><span class="badge badge-revision">74/100</span></td>
+              <td class="muted">412</td>
+              <td style="color:#FFB300;font-weight:600;">34</td>
+              <td><span class="badge badge-auditing"><span class="dot"></span>In Audit</span></td>
+              <td style="text-align:right;"><a href="projects.html" style="color:var(--text-muted);display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:12px;font-weight:600;text-decoration:none;" onmouseover="this.style.color='#E53935'" onmouseout="this.style.color=''"><span class="material-symbols-outlined" style="font-size:16px;">visibility</span>View</a></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">TradePortal Migration</td>
+              <td class="muted">Mai Linh</td>
+              <td><span class="badge badge-expired">30/100</span></td>
+              <td class="muted">215</td>
+              <td style="color:#E53935;font-weight:700;">48</td>
+              <td><span class="badge badge-revision"><span class="dot pulse-dot"></span>Needs Revision</span></td>
+              <td style="text-align:right;"><a href="projects.html" style="color:var(--text-muted);display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:12px;font-weight:600;text-decoration:none;" onmouseover="this.style.color='#E53935'" onmouseout="this.style.color=''"><span class="material-symbols-outlined" style="font-size:16px;">history_edu</span>Details</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end #default-view -->
+
+</main>
+
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+/* ── Role-based dashboard view switching ── */
+(function() {
+  var role = sessionStorage.getItem('userRole') || 'Senior BA';
+  if (role === 'PM') {
+    document.getElementById('pm-view').style.display = 'block';
+    document.getElementById('default-view').style.display = 'none';
+    document.getElementById('sba-callout').style.display = 'none';
+  } else if (role === 'Senior BA') {
+    document.getElementById('sba-callout').style.display = 'block';
+    document.getElementById('pm-view').style.display = 'none';
+    /* Remove the export button for Senior BA — read-only context */
+    var actions = document.getElementById('dashHeaderActions');
+    if (actions) {
+      actions.innerHTML = '<button class="btn btn-ghost"><span class="material-symbols-outlined">calendar_today</span> This month</button>';
+    }
+  } else {
+    /* BA — full view, keep all buttons */
+    document.getElementById('pm-view').style.display = 'none';
+    document.getElementById('sba-callout').style.display = 'none';
+  }
+
+  /* ── Load live stats from API ── */
+  (async function() {
+    if (typeof AAG === 'undefined') return;
+
+    if (role === 'PM') {
+      /* PM: load quality report */
+      var r = await AAG.get('/reports/quality');
+      if (!r || !r.ok) return;
+      var s = r.data.summary || {};
+      /* Update KPI cards */
+      var kpis = document.querySelectorAll('#pm-view .card');
+      if (kpis[0]) kpis[0].querySelector('span[style*="font-size:40px"]').textContent = s.avgTeamScore || '—';
+      if (kpis[1]) kpis[1].querySelector('span[style*="font-size:40px"]').textContent = s.passing || '—';
+      if (kpis[2]) kpis[2].querySelector('span[style*="font-size:40px"]').textContent = s.pendingReview || '—';
+      if (kpis[3]) kpis[3].querySelector('span[style*="font-size:40px"]').textContent = s.totalIssues || '—';
+      /* Update health bar fill for avg score */
+      var avgBar = kpis[0] ? kpis[0].querySelector('.health-bar-fill') : null;
+      if (avgBar && s.avgTeamScore) avgBar.style.width = s.avgTeamScore + '%';
+
+    } else {
+      /* BA / Senior BA: load dashboard stats */
+      var r = await AAG.get('/reports/dashboard');
+      if (!r || !r.ok) return;
+      var st = r.data.stats || {};
+      /* Update the 4 stat cards in default-view */
+      var cards = document.querySelectorAll('#default-view .card');
+      var nums  = document.querySelectorAll('#default-view .card span[style*="font-size:40px"]');
+      if (nums[0]) nums[0].textContent = st.totalProjects || '—';
+      if (nums[1]) nums[1].textContent = st.auditingCount || '—';
+      if (nums[2]) nums[2].textContent = st.approvedCount || '—';
+      if (nums[3]) nums[3].textContent = st.revisionCount || '—';
+      /* Update gauge arc for avg score */
+      var arc    = document.querySelector('#default-view .gauge-arc');
+      var gaugeN = document.querySelector('#default-view .gauge-label span[style*="font-size:36px"]');
+      if (arc && gaugeN && st.avgScore) {
+        var offset = 345.6 * (1 - st.avgScore / 100);
+        arc.setAttribute('stroke-dashoffset', offset.toFixed(1));
+        gaugeN.textContent = st.avgScore;
+      }
+    }
+  })();
+
+})();
+</script>
+</body>
+</html>
