@@ -175,12 +175,17 @@ class LMStudioProvider {
     this.name     = 'LM Studio (ReqBrain)';
     this.endpoint = (process.env.AI_BASE_URL || 'http://localhost:1234').replace(/\/$/, '');
     this.model    = process.env.AI_MODEL || 'reelicit_-_zephyr-7b-beta-reqbrain';
+    // ngrok free tier trả HTML interstitial nếu thiếu header này
+    this.extraHeaders = this.endpoint.includes('ngrok')
+      ? { 'ngrok-skip-browser-warning': 'true' }
+      : {};
   }
 
   async ping() {
     try {
       const r = await fetch(`${this.endpoint}/v1/models`, {
-        signal: AbortSignal.timeout(3000),
+        headers: this.extraHeaders,
+        signal: AbortSignal.timeout(10000), // tăng từ 3s → 10s cho Render-US→ngrok→VN
       });
       return r.ok;
     } catch {
@@ -219,7 +224,7 @@ class LMStudioProvider {
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       const r = await fetch(`${this.endpoint}/v1/chat/completions`, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...this.extraHeaders },
         body,
         signal: AbortSignal.timeout(300000),
       });
