@@ -4,6 +4,7 @@
   "description": "Backend API for AI Audit Gate — NAB Vietnam internship project",
   "main": "src/server.js",
   "scripts": {
+    "postinstall": "prisma generate",
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "migrate": "npx prisma migrate dev --name init",
