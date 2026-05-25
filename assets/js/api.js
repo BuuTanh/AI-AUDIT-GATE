@@ -94,6 +94,9 @@
     clearAuth,
     mapRole,
 
+    /* Expose base URL so other scripts can build fetch URLs without hardcoding localhost */
+    base: API_BASE,
+
     /* REST helpers */
     get:    function (path)        { return request('GET',    path); },
     post:   function (path, body)  { return request('POST',   path, body); },

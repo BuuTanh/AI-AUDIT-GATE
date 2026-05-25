@@ -539,7 +539,7 @@ async function callAI(mode, message, skipWelcome) {
       history = history.slice(0, -1);
     }
 
-    var res = await fetch('http://localhost:3001/api/ai/chat', {
+    var res = await fetch('window.AAG.base/ai/chat', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body:    JSON.stringify({ mode: mode, message: message, history: history }),
@@ -660,7 +660,7 @@ function handleFileSelect(inputEl) {
     document.getElementById('sendBtn').disabled = true;
     showThinking();
     var token = localStorage.getItem('aag-token');
-    fetch('http://localhost:3001/api/ai/audit-file', {
+    fetch('window.AAG.base/ai/audit-file', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token },
       body: formData
@@ -723,7 +723,7 @@ function openProjectPicker() {
   document.getElementById('confirmSaveBtn').disabled = true;
 
   var token = localStorage.getItem('aag-token');
-  fetch('http://localhost:3001/api/projects', { headers: { 'Authorization': 'Bearer ' + token } })
+  fetch('window.AAG.base/projects', { headers: { 'Authorization': 'Bearer ' + token } })
     .then(function(r) { return r.json(); })
     .then(function(data) { renderProjectPickerList(data.projects || []); })
     .catch(function() { renderProjectPickerList([]); });
@@ -778,7 +778,7 @@ async function confirmSave() {
 
   var token = localStorage.getItem('aag-token');
   try {
-    var res = await fetch('http://localhost:3001/api/projects/' + selectedProjectId + '/documents/from-ai', {
+    var res = await fetch('window.AAG.base/projects/' + selectedProjectId + '/documents/from-ai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ requirements: reqs, title: title })
@@ -1101,7 +1101,7 @@ function renderRawText(text) {
 
 /* ── Check AI provider status and update badge ── */
 function checkAIStatus() {
-  fetch('http://localhost:3001/api/ai/status')
+  fetch('window.AAG.base/ai/status')
     .then(function(r){ return r.json(); })
     .then(function(d) {
       var dot  = document.getElementById('aiStatusDot');

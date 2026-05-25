@@ -305,7 +305,7 @@ function openDocPreview(idx) {
   var isApiDoc = !isNaN(Number(doc.id)) && String(doc.id).trim() !== '';
   if (isApiDoc) {
     var _token = localStorage.getItem('aag-token') || '';
-    fetch('http://localhost:3001/api/documents/' + doc.id + '/view', {
+    fetch('window.AAG.base/documents/' + doc.id + '/view', {
       headers: _token ? { 'Authorization': 'Bearer ' + _token } : {}
     })
     .then(function(r) {
@@ -489,7 +489,7 @@ function openPdfNewTab() {
   if (isApiDoc) {
     // Re-fetch with auth and open as blob URL so new tab can render it
     var _token = localStorage.getItem('aag-token') || '';
-    fetch('http://localhost:3001/api/documents/' + doc.id + '/view', {
+    fetch('window.AAG.base/documents/' + doc.id + '/view', {
       headers: _token ? { 'Authorization': 'Bearer ' + _token } : {}
     })
     .then(function(r) { return r.text(); })
@@ -526,7 +526,7 @@ function downloadPdfDoc() {
     // Fetch with auth, open blob URL, then trigger print
     var _token = localStorage.getItem('aag-token') || '';
     showToast('Đang chuẩn bị bản in...', 'success');
-    fetch('http://localhost:3001/api/documents/' + doc.id + '/view', {
+    fetch('window.AAG.base/documents/' + doc.id + '/view', {
       headers: _token ? { 'Authorization': 'Bearer ' + _token } : {}
     })
     .then(function(r) { return r.text(); })
