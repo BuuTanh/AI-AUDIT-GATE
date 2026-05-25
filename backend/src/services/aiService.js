@@ -219,8 +219,8 @@ class LMStudioProvider {
       stream:      false,
     });
 
-    // Retry tối đa 3 lần — xử lý "Model reloaded." khi LM Studio JIT reload
-    const MAX_RETRIES = 3;
+    // Retry tối đa 5 lần — xử lý "Model reloaded." khi LM Studio JIT reload
+    const MAX_RETRIES = 5;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       const r = await fetch(`${this.endpoint}/v1/chat/completions`, {
         method:  'POST',
@@ -235,9 +235,9 @@ class LMStudioProvider {
         // LM Studio trả 400 khi JIT reload ("Model reloaded.") hoặc model crash — đợi rồi retry
         if (r.status === 400 && attempt < MAX_RETRIES) {
           const isCrash   = errText.includes('crashed') || errText.includes('Exit code');
-          const waitMs    = isCrash ? 8000 : 5000;
+          const waitMs    = isCrash ? 10000 : 8000;  // tăng từ 5s→8s, crash từ 8s→10s
           const reason    = isCrash ? 'model crashed' : 'model reloading';
-          console.log(`[AI] LM Studio ${reason}, waiting ${waitMs / 1000}s then retry (attempt ${attempt})...`);
+          console.log(`[AI] LM Studio ${reason}, waiting ${waitMs / 1000}s then retry (attempt ${attempt}/${MAX_RETRIES})...`);
           await new Promise(res => setTimeout(res, waitMs));
           continue;
         }
