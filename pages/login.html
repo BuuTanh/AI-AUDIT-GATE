@@ -103,6 +103,8 @@
 
   </div>
 
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/api.js"></script>
   <script src="../assets/js/app.js"></script>
   <script>
     /* ── Redirect if already logged in ── */
@@ -121,18 +123,17 @@
       }
     })();
 
-    /* ── Server health check ── */
+    /* ── Server health check (dùng AAG để tự nhận API URL từ config.js) ── */
     (function() {
-      fetch('http://localhost:3001/api/health')
-        .then(function(r) { return r.json(); })
-        .then(function() {
+      window.AAG.get('/health').then(function(r) {
+        if (r && r.ok) {
           document.getElementById('statusDot').style.background  = '#43A047';
           document.getElementById('statusText').textContent = 'System running';
-        })
-        .catch(function() {
+        } else {
           document.getElementById('statusDot').style.background  = '#E53935';
           document.getElementById('statusText').textContent = 'Cannot reach server — start backend first';
-        });
+        }
+      });
     })();
 
     /* ── Fill demo credentials ── */
@@ -160,7 +161,7 @@
       document.getElementById('loginError').style.display = 'none';
     }
 
-    /* ── Handle login ── */
+    /* ── Handle login (dùng AAG.login() — tự dùng URL từ config.js) ── */
     async function handleLogin(e) {
       e.preventDefault();
       hideError();
@@ -177,41 +178,25 @@
       btn.innerHTML = '<span class="material-symbols-outlined spin" style="font-size:18px;">progress_activity</span> Signing in…';
       btn.disabled  = true;
 
-      try {
-        var res = await fetch('http://localhost:3001/api/auth/login', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ username, password }),
-        });
-        var data = await res.json();
+      var res = await window.AAG.login(username, password);
 
-        if (!res.ok) {
-          showError(data.error || 'Invalid username or password.');
-          btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">login</span> Sign In';
-          btn.disabled  = false;
-          return;
-        }
-
-        /* ── Success: store token + user ── */
-        localStorage.setItem('aag-token', data.token);
-        localStorage.setItem('aag-user',  JSON.stringify(data.user));
-        sessionStorage.setItem('userRole', data.user.role === 'SENIOR_BA' ? 'Senior BA' : data.user.role);
-        sessionStorage.setItem('userName', data.user.fullName);
-
-        /* ── Role-based redirect ── */
-        var roleHome = {
-          'BA':        'ba-workspace.html',
-          'SENIOR_BA': 'dashboard.html',
-          'PM':        'dashboard.html',
-        };
-        btn.innerHTML = '<span class="material-symbols-outlined spin" style="font-size:18px;">progress_activity</span> Redirecting…';
-        window.location.href = roleHome[data.user.role] || 'dashboard.html';
-
-      } catch (err) {
-        showError('Cannot connect to server. Make sure the backend is running (npm run dev).');
+      if (!res || !res.ok) {
+        var msg = (res && res.data && res.data.error) || 'Cannot connect to server. Check your connection.';
+        showError(msg);
         btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">login</span> Sign In';
         btn.disabled  = false;
+        return;
       }
+
+      /* ── Success: AAG.login() đã lưu token + user vào localStorage ── */
+      var role = res.data.user.role;
+      var roleHome = {
+        'BA':        'ba-workspace.html',
+        'SENIOR_BA': 'dashboard.html',
+        'PM':        'dashboard.html',
+      };
+      btn.innerHTML = '<span class="material-symbols-outlined spin" style="font-size:18px;">progress_activity</span> Redirecting…';
+      window.location.href = roleHome[role] || 'dashboard.html';
     }
   </script>
 </body>
