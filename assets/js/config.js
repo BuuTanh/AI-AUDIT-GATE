@@ -9,4 +9,4 @@
  *   window.AAG_API_BASE = 'https://yourname.ngrok-free.app/api';
  * ─────────────────────────────────────────────────────────────
  */
-window.AAG_API_BASE = 'https://plumosely-undelayed-shena.ngrok-free.dev/api';
+window.AAG_API_BASE = 'https://ai-audit-gate.onrender.com/api';
