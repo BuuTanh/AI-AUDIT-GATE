@@ -24,7 +24,7 @@
   function doLogout() {
     var token = localStorage.getItem('aag-token');
     if (token) {
-      fetch('window.AAG.base/auth/logout', {
+      fetch(window.AAG.base + '/auth/logout', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
       }).catch(function(){});
